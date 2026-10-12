@@ -1,0 +1,5 @@
+maxapi
+SQLAlchemy==2.0.*
+asyncpg
+python-dotenv
+alembic
