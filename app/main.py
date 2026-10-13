@@ -7,7 +7,8 @@ from datetime import datetime
 from typing import Any
 
 from maxapi import Bot, Dispatcher
-from maxapi.methods.send_message import AttachmentButton
+from maxapi.enums.attachment import AttachmentType
+from maxapi.types import Attachment
 
 from app import config
 from app.db import crud
@@ -76,7 +77,9 @@ async def _send(
         chat_id=chat_id,
         user_id=user_id,
         text=text,
-        attachments=[AttachmentButton(type="inline_keyboard", payload=buttons)]
+        attachments=[
+            Attachment(type=AttachmentType.INLINE_KEYBOARD, payload=buttons)
+        ]
         if buttons is not None
         else None,
     )

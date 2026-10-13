@@ -8,7 +8,7 @@ from fastapi import HTTPException
 from fastapi.security import HTTPBasicCredentials
 from cryptography.fernet import Fernet
 from fastapi.testclient import TestClient
-from maxapi.methods.send_message import AttachmentButton
+from maxapi.types import Attachment
 from sqlalchemy import BigInteger, UniqueConstraint
 
 from app.admin_web import main as admin
@@ -42,7 +42,7 @@ def test_send_wraps_inline_keyboard_in_max_attachment(
     assert isinstance(attachments, list)
     assert len(attachments) == 1
     attachment = attachments[0]
-    assert isinstance(attachment, AttachmentButton)
+    assert isinstance(attachment, Attachment)
     assert attachment.model_dump(mode="json", exclude_none=True) == {
         "type": "inline_keyboard",
         "payload": {
