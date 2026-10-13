@@ -3,3 +3,8 @@ SQLAlchemy==2.0.*
 asyncpg
 python-dotenv
 alembic
+fastapi
+uvicorn[standard]
+jinja2
+python-multipart
+cryptography

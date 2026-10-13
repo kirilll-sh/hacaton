@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Заявки сотрудников — Школьный штаб</title>
+    <style>
+      body { font: 16px system-ui, sans-serif; margin: 2rem auto; max-width: 1100px; padding: 0 1rem; }
+      table { border-collapse: collapse; width: 100%; }
+      th, td { border-bottom: 1px solid #ddd; padding: .7rem; text-align: left; }
+      form { display: inline; }
+      button { cursor: pointer; margin-right: .35rem; padding: .45rem .7rem; }
+      .empty { color: #555; }
+    </style>
+  </head>
+  <body>
+    <nav><a href="/admin/requests">Заявки сотрудников</a> · <a href="/admin/accounts">Аккаунты</a></nav>
+    <h1>Заявки сотрудников</h1>
+    {% if requests %}
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>MAX ID</th><th>ФИО</th><th>Школа</th><th>Роль</th><th>Дата заявки</th><th>Действие</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in requests %}
+        <tr>
+          <td>{{ user.id }}</td>
+          <td>{{ user.max_user_id }}</td>
+          <td>{{ user.name }}</td>
+          <td>{{ user.school or "—" }}</td>
+          <td>{{ "Учитель" if user.role == "teacher" else "Психолог" }}</td>
+          <td>{{ user.created_at.strftime("%d.%m.%Y %H:%M") if user.created_at else "—" }}</td>
+          <td>
+            <form method="post" action="/admin/requests/{{ user.id }}">
+              <button name="action" value="approve">Подтвердить</button>
+              <button name="action" value="reject">Отклонить</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="empty">Новых заявок нет.</p>
+    {% endif %}
+  </body>
+</html>

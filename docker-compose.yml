@@ -1,10 +1,8 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:15-alpine
     container_name: hq_postgres
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -13,16 +11,44 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    build: .
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    command: alembic upgrade head
 
   bot:
     build: .
     container_name: hq_bot
-    restart: always
+    restart: unless-stopped
     env_file:
       - .env
     depends_on:
-      - db
-    command: python app/main.py
+      migrate:
+        condition: service_completed_successfully
+    command: python -m app.main
+
+  admin:
+    build: .
+    container_name: hq_admin
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - "8000:8000"
+    command: uvicorn app.admin_web.main:app --host 0.0.0.0 --port 8000
 
 volumes:
   pgdata:
